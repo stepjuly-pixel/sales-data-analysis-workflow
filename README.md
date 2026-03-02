@@ -7,11 +7,11 @@ The objective is to transform raw transactional data into structured insights th
 
 The project follows a structured analytical pipeline:
 
-- Data inspection
+- Data inspection and merging of three source tables
 
 - Data cleaning and validation
 
-- Feature engineering
+- Feature engineering (Revenue, Total Cost, Profit)
 
 - Exploratory Data Analysis (EDA)
 
@@ -33,100 +33,115 @@ This notebook reflects a real-world data analyst approach rather than isolated v
 
 ## Dataset
 
-The dataset contains transactional sales records with the following key attributes:
+The project uses three source datasets that are merged into a single analytical dataframe:
 
-- ```order_id``` – unique order identifier
+**Events** — transactional sales records:
 
-- ```order_date``` – date of purchase
+- `order_id` – unique order identifier
 
-- ```ship_date``` – shipping date
+- `order_date` – date of purchase
 
-- ```order_priority``` – order priority level
+- `ship_date` – shipping date
 
-- ```country_code``` – country of sale
+- `order_priority` – order priority level
 
-- ```product_id``` – product identifier
+- `country_code` – country of sale
 
-- ```sales_channel``` – sales channel (Online / Offline)
+- `product_id` – product identifier
 
-- ```units_sold``` – number of units sold
+- `sales_channel` – sales channel (Online / Offline)
 
-- ```unit_price``` – price per unit
+- `units_sold` – number of units sold
 
-- ```unit_cost``` – cost per unit
+- `unit_price` – price per unit
+
+- `unit_cost` – cost per unit
+
+**Products** — product catalog with `id` and `item_type`
+
+**Countries** — country reference with `alpha-3`, `region`, `sub-region`
 
 ## Data Preparation
 
 The following preprocessing steps were performed:
 
-- Data structure inspection
+- Data structure inspection across all three tables
 
-- Data type corrections (date conversion)
+- Data type corrections (date conversion for `order_date` and `ship_date`)
 
-- Missing value validation
+- Missing value handling (country codes filled with "Unknown", `units_sold` filled with mean)
 
-- Duplicate check
+- Cyrillic-to-Latin character normalization and duplicate check
 
-- Numerical consistency checks
+- Merging tables via `product_id` and `country_code`
 
-- Creation of calculated metrics:
-
-  - Revenue
-
-  - Total Cost
-
-  - Profit
-
-These steps ensure analytical accuracy and business-ready metrics.
+- Creation of calculated metrics: Revenue, Total Cost, Profit
 
 ## Exploratory Data Analysis
 
-### Revenue & Profit Distribution
+### Revenue & Profit by Category
 
-- Analysis of revenue and profit distributions
-  
-- Detection of outliers
+- The most profitable category is **Cosmetics**, the least profitable is **Fruits**.
 
-### Sales Channel Performance
+- The highest revenue and costs are in the **Office Supplies** category.
 
-- Comparison between Online and Offline channels
+- Profit distribution between Online and Offline channels is relatively close in value across categories.
 
-- Differences in sales volume and profitability structure
+<img src="images/profit_category.png" width="550" />
 
 ### Geographic Performance
 
-- Revenue comparison across countries and regions
+- Top countries by order volume: **San Marino**, **Andorra**, **Romania**
 
-- Profitability differences between regions
+- Revenue by sub-region: **Southern Europe** leads (33.1%), followed by **Eastern Europe** (22.2%) and **Northern Europe** (17.4%)
 
-## Delivery & Profit Relationship
+<img src="images/plots.png" width="800" />
 
-- Analysis of delivery timing (order vs ship date)
+### Shipping Interval Analysis
 
-- Evaluation of its relationship with profitability
+- Average shipping interval varies by category; the longest delays are in **Office Supplies** and **Cereal**
 
-### Time-Based Trends
+- By country: longest shipping time in **Hungary**, shortest in **Croatia**
 
-- Monthly revenue and profit trends
+- By region: delivery in **Asia** takes longer than in **Europe**
 
-- Analyzing product sales by day of the week
+### Profit vs Shipping Interval
 
-- Detection of growth patterns and seasonality
+- No direct linear relationship between shipping time and profit
+
+- Profit is distributed evenly across the entire range (1–50 days), meaning delivery time does not significantly affect profitability
+
+<img src="images/profut_vs_shipping.png" width="700" />
+
+### Sales Dynamics Over Time
+
+- Revenue dynamics differ across categories and countries — no single general trend
+
+- European region shows significantly higher values compared to Asia, with more volatile dynamics
+
+### Orders by Day of Week
+
+- Most orders are placed on **Sunday** (207), fewest on **Thursday** (167)
+
+- Distribution is relatively even across most categories, with some exceptions: Household sales dip on Tuesday, Fruits sales peak on weekends
+
+<img src="images/order_day_week.png" width="550" />
 
 ## Key Insights
 
-- Revenue growth does not always translate into proportional profit growth.
+- The most profitable category is **Cosmetics**; the least profitable is **Fruits**
 
-- Online and Offline channels demonstrate structural differences in sales volume and margin performance.
+- Online and Offline channels show relatively similar profit distribution across categories
 
-- Geographic segmentation reveals uneven profitability across countries.
+- **Southern Europe** generates the largest share of revenue (33.1%)
 
-- Order priority and delivery timing show no strong correlation with profitability, indicating that operational urgency does not necessarily increase financial return.
+- Shipping interval does not significantly affect profitability
 
-- Seasonality patterns suggest opportunities for forecasting optimization.
+- Delivery in Asia takes longer than in Europe
 
-<img width="1163" height="808" alt="plots" src="https://github.com/user-attachments/assets/9f5c3912-4c43-4292-af42-f64a84f48f94" />
+- Sunday has the highest order volume; Thursday has the lowest
 
+- Revenue dynamics vary across categories and regions with no single universal trend
 
 ## How to Run
 
@@ -138,13 +153,18 @@ These steps ensure analytical accuracy and business-ready metrics.
 pip install -r requirements.txt
 ```
 
-3. Open data-analysis-workflow.ipynb in Jupyter Notebook or Google Colab
+3. Open [`data_analysis_workflow.ipynb`](data_analysis_workflow.ipynb) in Jupyter Notebook or Google Colab
 
 ## Project Structure
-```
-sales-data-analysis-workflow/
 
-- data-analysis-workflow.ipynb
-- requirements.txt
-- README.md
+```
+full-data-analysis-workflow/
+├── images/
+│   ├── plots.png
+│   ├── profit_category.png
+│   ├── profut_vs_shipping.png
+│   └── order_day_week.png
+├── data_analysis_workflow.ipynb
+├── requirements.txt
+└── README.md
 ```
